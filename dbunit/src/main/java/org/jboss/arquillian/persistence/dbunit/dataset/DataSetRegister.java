@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.dbunit.database.DatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 
 /**
@@ -30,8 +31,16 @@ import org.dbunit.dataset.IDataSet;
  * @author <a href="mailto:bartosz.majsak@gmail.com">Bartosz Majsak</a>
  *
  */
-public class DataSetRegister
-{
+public class DataSetRegister {
+    private DatabaseConnection databaseConnection;
+
+    public DatabaseConnection getDatabaseConnection() {
+        return this.databaseConnection;
+    }
+
+    public void setDatabaseConnection(final DatabaseConnection databaseConnection) {
+        this.databaseConnection = databaseConnection;
+    }
 
    private final List<IDataSet> initial = new ArrayList<IDataSet>();
    

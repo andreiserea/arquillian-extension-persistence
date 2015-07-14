@@ -18,12 +18,16 @@
 package org.jboss.arquillian.persistence.core.metadata;
 
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.jboss.arquillian.persistence.Cleanup;
 import org.jboss.arquillian.persistence.CleanupStrategy;
 import org.jboss.arquillian.persistence.CleanupUsingScript;
 import org.jboss.arquillian.persistence.DataSeedStrategy;
 import org.jboss.arquillian.persistence.DataSource;
+import org.jboss.arquillian.persistence.DataSourceWithData;
+import org.jboss.arquillian.persistence.DataSourcesWithData;
 import org.jboss.arquillian.persistence.SeedDataUsing;
 import org.jboss.arquillian.persistence.TestExecutionPhase;
 import org.jboss.arquillian.persistence.core.configuration.PersistenceConfiguration;
@@ -60,11 +64,15 @@ public class PersistenceExtensionFeatureResolver
       return metadataExtractor.createSchema().isDefinedOnClassLevel();
    }
 
-   public boolean shouldSeedData()
-   {
-      return metadataExtractor.usingDataSet().isDefinedOnClassLevel()
-            || metadataExtractor.usingDataSet().isDefinedOn(testMethod);
-   }
+    public boolean shouldSeedData() {
+        return this.metadataExtractor.usingDataSet().isDefinedOnClassLevel()
+                || this.metadataExtractor.usingDataSet().isDefinedOn(this.testMethod)
+                || this.metadataExtractor.dataSourcesWithData().isDefinedOn(this.testMethod);
+    }
+
+    public boolean hasMultipleDataSources() {
+        return this.metadataExtractor.dataSourcesWithData().isDefinedOn(this.testMethod);
+    }
 
    public boolean shouldCustomScriptBeAppliedBeforeTestRequested()
    {
@@ -133,27 +141,36 @@ public class PersistenceExtensionFeatureResolver
       return shouldCleanup() && TestExecutionPhase.AFTER.equals(getCleanupTestPhase());
    }
 
-   public String getDataSourceName()
-   {
-      String dataSource = "";
+    public List<String> getDataSourceName() {
+        final LinkedList<String> dataSourcesNames = new LinkedList<String>();
 
-      if (configuration.isDefaultDataSourceDefined())
-      {
-         dataSource = configuration.getDefaultDataSource();
-      }
+        final DataSource dataSourceAnnotation = this.metadataExtractor.dataSource().fetchUsingFirst(this.testMethod);
+        if (dataSourceAnnotation != null) {
+            final String dataSourceName = dataSourceAnnotation.value();
+            dataSourcesNames.add(dataSourceName);
+        }
+        final DataSourcesWithData dataSourcesWithData = this.metadataExtractor.dataSourcesWithData().fetchUsingFirst(
+                this.testMethod);
+        if (dataSourcesWithData != null) {
+            for (final DataSourceWithData dataSourceWithData : dataSourcesWithData.value()) {
+                final String dataSourceName = dataSourceWithData.source().value();
+                dataSourcesNames.add(dataSourceName);
+            }
+        }
+        if ((dataSourceAnnotation == null) && (dataSourcesWithData == null)) {
+            String dataSource = "";
 
-      final DataSource dataSourceAnnotation = metadataExtractor.dataSource().fetchUsingFirst(testMethod);
-      if (dataSourceAnnotation != null)
-      {
-         dataSource = dataSourceAnnotation.value();
-      }
+            if (this.configuration.isDefaultDataSourceDefined()) {
+                dataSource = this.configuration.getDefaultDataSource();
+            }
+            if (Strings.isEmpty(dataSource)) {
+                throw new DataSourceNotDefinedException(
+                        "DataSource not defined! Please declare in arquillian.xml or by using @DataSource annotation.");
+            }
+            dataSourcesNames.add(dataSource);
+        }
 
-      if (Strings.isEmpty(dataSource))
-      {
-         throw new DataSourceNotDefinedException("DataSource not defined! Please declare it in arquillian.xml or by using @DataSource annotation.");
-      }
-
-      return dataSource;
-   }
+        return dataSourcesNames;
+    }
 
 }

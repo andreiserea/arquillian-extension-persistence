@@ -17,8 +17,9 @@
  */
 package org.jboss.arquillian.persistence.core.metadata;
 
+import java.lang.reflect.Method;
+
 import org.jboss.arquillian.test.spi.TestClass;
-import org.jboss.arquillian.test.spi.event.suite.TestEvent;
 
 /**
 *
@@ -29,6 +30,16 @@ public class PersistenceExtensionEnabler
 {
 
    private final MetadataExtractor metadataExtractor;
+
+	private Method currentMethod;
+
+	public Method getCurrentMethod() {
+		return this.currentMethod;
+	}
+
+	public void setCurrentMethod(final Method currentMethod) {
+		this.currentMethod = currentMethod;
+	}
 
    public PersistenceExtensionEnabler(TestClass testClass)
    {
@@ -45,12 +56,17 @@ public class PersistenceExtensionEnabler
       return (hasDataSetAnnotation() || hasApplyScriptAnnotation()
             || hasPersistenceTestAnnotation() || hasJpaCacheEvictionAnnotation()
             || hasCreateSchemaAnnotation() || hasCleanupAnnotation()
-            || hasCleanupUsingScriptAnnotation());
+            || hasCleanupUsingScriptAnnotation() || this.hasMultipleDataSources());
    }
 
    // ---------------------------------------------------------------------------------------------------
    // Internal methods
    // ---------------------------------------------------------------------------------------------------
+
+	private boolean hasMultipleDataSources() {
+		return this.currentMethod == null ? this.metadataExtractor.dataSourcesWithData().isDefinedOnAnyMethod()
+				: this.metadataExtractor.dataSourcesWithData().isDefinedOn(this.currentMethod);
+	}
 
    private boolean hasDataSetAnnotation()
    {

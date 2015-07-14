@@ -22,16 +22,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.arquillian.persistence.ApplyScriptAfter;
+import org.jboss.arquillian.persistence.ApplyScriptBefore;
 import org.jboss.arquillian.persistence.Cleanup;
 import org.jboss.arquillian.persistence.CleanupUsingScript;
 import org.jboss.arquillian.persistence.CreateSchema;
 import org.jboss.arquillian.persistence.DataSource;
+import org.jboss.arquillian.persistence.DataSourceWithData;
+import org.jboss.arquillian.persistence.DataSourcesWithData;
 import org.jboss.arquillian.persistence.JpaCacheEviction;
 import org.jboss.arquillian.persistence.PersistenceTest;
 import org.jboss.arquillian.persistence.SeedDataUsing;
 import org.jboss.arquillian.persistence.ShouldMatchDataSet;
 import org.jboss.arquillian.persistence.UsingDataSet;
-import org.jboss.arquillian.persistence.ApplyScriptBefore;
 import org.jboss.arquillian.test.spi.TestClass;
 
 /**
@@ -115,6 +117,14 @@ public class MetadataExtractor
    {
       return using(CreateSchema.class);
    }
+
+    public AnnotationInspector<DataSourcesWithData> dataSourcesWithData() {
+        return this.using(DataSourcesWithData.class);
+    }
+
+    public AnnotationInspector<DataSourceWithData> dataSourceWithData() {
+        return this.using(DataSourceWithData.class);
+    }
 
    public boolean hasPersistenceTestAnnotation()
    {

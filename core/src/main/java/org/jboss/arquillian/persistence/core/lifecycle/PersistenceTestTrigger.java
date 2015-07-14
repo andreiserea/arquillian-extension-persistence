@@ -17,6 +17,10 @@
  */
 package org.jboss.arquillian.persistence.core.lifecycle;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import org.jboss.arquillian.core.api.Event;
 import org.jboss.arquillian.core.api.Instance;
 import org.jboss.arquillian.core.api.InstanceProducer;
@@ -50,9 +54,27 @@ import javax.sql.DataSource;
  * @author <a href="mailto:bartosz.majsak@gmail.com">Bartosz Majsak</a>
  *
  */
-public class PersistenceTestTrigger
-{
+public class PersistenceTestTrigger {
+	/* TODO Move to own class ? */
+	public static class DataSourceMap {
+		private final Map<String, DataSource> dataSources;
 
+		public DataSourceMap() {
+			this.dataSources = new HashMap<String, DataSource>();
+		}
+
+		public DataSourceMap(final Map<String, DataSource> dataSources) {
+			this.dataSources = dataSources;
+		}
+
+		public List<DataSource> getDataSources() {
+			return new LinkedList<DataSource>(this.dataSources.values());
+		}
+
+		public DataSource findByName(final String datasourceName) {
+			return this.dataSources.get(datasourceName);
+		}
+	}
    @Inject @ClassScoped
    private InstanceProducer<MetadataExtractor> metadataExtractorProducer;
 
@@ -66,7 +88,7 @@ public class PersistenceTestTrigger
    private InstanceProducer<PersistenceExtensionScriptingFeatureResolver> persistenceExtensionScriptingFeatureResolverProvider;
 
    @Inject @TestScoped
-   private InstanceProducer<javax.sql.DataSource> dataSourceProducer;
+	private InstanceProducer<DataSourceMap> dataSourceProducer;
 
    @Inject
    private Instance<PersistenceConfiguration> configurationInstance;
@@ -106,7 +128,7 @@ public class PersistenceTestTrigger
       PersistenceConfiguration persistenceConfiguration = configurationInstance.get();
       persistenceExtensionFeatureResolverProvider.set(new PersistenceExtensionFeatureResolver(beforeTestEvent.getTestMethod(), metadataExtractorProducer.get(), persistenceConfiguration));
       persistenceExtensionScriptingFeatureResolverProvider.set(new PersistenceExtensionScriptingFeatureResolver(beforeTestEvent.getTestMethod(), metadataExtractorProducer.get(), scriptingConfigurationInstance.get()));
-
+		this.persistenceExtensionEnabler.get().setCurrentMethod(beforeTestEvent.getTestMethod());
       if (persistenceExtensionEnabler.get().shouldPersistenceExtensionBeActivated())
       {
          createDataSource();
@@ -125,12 +147,15 @@ public class PersistenceTestTrigger
 
    // Private methods
 
-   private void createDataSource()
-   {
-      String dataSourceName = persistenceExtensionFeatureResolverProvider.get().getDataSourceName();
-      dataSourceProducer.set(loadDataSource(dataSourceName));
-   }
-
+	private void createDataSource() {
+		final List<String> dataSourcesNames = this.persistenceExtensionFeatureResolverProvider.get()
+				.getDataSourceName();
+		final Map<String, DataSource> datasourcesMap = new HashMap<String, DataSource>();
+		for (final String dataSourceName : dataSourcesNames) {
+			datasourcesMap.put(dataSourceName, this.loadDataSource(dataSourceName));
+		}
+		this.dataSourceProducer.set(new DataSourceMap(datasourcesMap));
+	}
    /**
     * @param dataSourceName
     * @return
