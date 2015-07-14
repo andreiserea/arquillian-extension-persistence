@@ -19,12 +19,12 @@ package org.jboss.arquillian.persistence.core.metadata;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import org.jboss.arquillian.persistence.UsingDataSet;
+import java.util.List;
+
 import org.jboss.arquillian.persistence.DataSource;
+import org.jboss.arquillian.persistence.UsingDataSet;
 import org.jboss.arquillian.persistence.core.configuration.PersistenceConfiguration;
 import org.jboss.arquillian.persistence.core.exception.DataSourceNotDefinedException;
-import org.jboss.arquillian.persistence.core.metadata.MetadataExtractor;
-import org.jboss.arquillian.persistence.core.metadata.PersistenceExtensionFeatureResolver;
 import org.jboss.arquillian.persistence.testutils.TestConfigurationLoader;
 import org.jboss.arquillian.test.spi.event.suite.TestEvent;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class PersistenceExtensionFeatureResolverDataSourceTest
       PersistenceExtensionFeatureResolver persistenceExtensionFeatureResolver = new PersistenceExtensionFeatureResolver(testEvent.getTestMethod(), new MetadataExtractor(testEvent.getTestClass()), TestConfigurationLoader.createPersistenceConfigurationFrom("arquillian-without-persistence-properties.xml"));
 
       // when
-      String dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
+      final List<String> dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
 
       // then
       // exception should be thrown
@@ -64,10 +64,10 @@ public class PersistenceExtensionFeatureResolverDataSourceTest
       PersistenceExtensionFeatureResolver persistenceExtensionFeatureResolver = new PersistenceExtensionFeatureResolver(testEvent.getTestMethod(), new MetadataExtractor(testEvent.getTestClass()), defaultConfiguration);
 
       // when
-      String dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
+      final List<String> dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
 
       // then
-      assertThat(dataSourceName).isEqualTo(expectedDataSourceName);
+      assertThat(dataSourceName.get(0)).isEqualTo(expectedDataSourceName);
    }
 
    @Test
@@ -80,10 +80,10 @@ public class PersistenceExtensionFeatureResolverDataSourceTest
       PersistenceExtensionFeatureResolver persistenceExtensionFeatureResolver = new PersistenceExtensionFeatureResolver(testEvent.getTestMethod(), new MetadataExtractor(testEvent.getTestClass()), defaultConfiguration);
 
       // when
-      String dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
+      final List<String> dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
 
       // then
-      assertThat(dataSourceName).isEqualTo(expectedDataSourceName);
+      assertThat(dataSourceName.get(0)).isEqualTo(expectedDataSourceName);
    }
 
    @Test
@@ -96,10 +96,10 @@ public class PersistenceExtensionFeatureResolverDataSourceTest
       PersistenceExtensionFeatureResolver persistenceExtensionFeatureResolver = new PersistenceExtensionFeatureResolver(testEvent.getTestMethod(), new MetadataExtractor(testEvent.getTestClass()), defaultConfiguration);
 
       // when
-      String dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
+      final List<String> dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
 
       // then
-      assertThat(dataSourceName).isEqualTo(expectedDataSourceName);
+      assertThat(dataSourceName.get(0)).isEqualTo(expectedDataSourceName);
    }
 
    @Test(expected = DataSourceNotDefinedException.class)
@@ -112,7 +112,7 @@ public class PersistenceExtensionFeatureResolverDataSourceTest
       PersistenceExtensionFeatureResolver persistenceExtensionFeatureResolver = new PersistenceExtensionFeatureResolver(testEvent.getTestMethod(), new MetadataExtractor(testEvent.getTestClass()), TestConfigurationLoader.createPersistenceConfigurationFrom("arquillian-without-persistence-properties.xml"));
 
       // when
-      String dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
+      final List<String> dataSourceName = persistenceExtensionFeatureResolver.getDataSourceName();
 
       // then
       // exception should be thrown
