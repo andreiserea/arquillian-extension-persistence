@@ -45,7 +45,9 @@ public class PersistenceExtensionConventionTransactionEnabler implements Transac
    @Override
    public boolean isTransactionHandlingDefinedOnMethodLevel(TestEvent testEvent)
    {
-      return shouldWrapTestMethodInTransaction(testEvent.getTestMethod());
+      return false;
+      //should not wrap with transaction because it messes up the tests
+      //return shouldWrapTestMethodInTransaction(testEvent.getTestMethod());
    }
 
    @Override
