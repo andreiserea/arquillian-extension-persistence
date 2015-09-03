@@ -102,8 +102,9 @@ public class PersistenceExtensionEnabler
 
    private boolean hasCleanupAnnotation()
    {
+	 //persistence should be activated only if the current method needs it
       return metadataExtractor.cleanup().isDefinedOnClassLevel()
-            || metadataExtractor.cleanup().isDefinedOnAnyMethod();
+            || (this.currentMethod == null ? this.metadataExtractor.cleanup().isDefinedOnAnyMethod() : this.metadataExtractor.cleanup().isDefinedOn(this.currentMethod));
    }
 
    private boolean hasCleanupUsingScriptAnnotation()

@@ -181,12 +181,15 @@ public class DBUnitDataHandler implements DataHandler<PrepareDBUnitData, Compare
     }
 
     private void cleanDatabase(final CleanupStrategy cleanupStrategy) {
-        final List<DataSetRegister> dataSetRegisters = this.dataSetRegister.get().getDataSetRegisters();
-        for (final DataSetRegister dataSetRegister : dataSetRegisters) {
-			final CleanupStrategyExecutor cleanupStrategyExecutor = cleanupStrategy
-	                    .provide(new CleanupStrategyProvider(dataSetRegister.getDatabaseConnection(), dataSetRegister, dbunitConfigurationInstance.get()));
-	      cleanupStrategyExecutor.cleanupDatabase(dbunitConfigurationInstance.get().getExcludeTablesFromCleanup());
-		}
+        DataSetRegisterList dataSetRegisterList = this.dataSetRegister.get();
+        if (dataSetRegisterList != null) {
+        	final List<DataSetRegister> dataSetRegisters = dataSetRegisterList.getDataSetRegisters();
+	        for (final DataSetRegister dataSetRegister : dataSetRegisters) {
+				final CleanupStrategyExecutor cleanupStrategyExecutor = cleanupStrategy
+		                    .provide(new CleanupStrategyProvider(dataSetRegister.getDatabaseConnection(), dataSetRegister, dbunitConfigurationInstance.get()));
+		      cleanupStrategyExecutor.cleanupDatabase(dbunitConfigurationInstance.get().getExcludeTablesFromCleanup());
+	        }
+        }
    }
 
 }
