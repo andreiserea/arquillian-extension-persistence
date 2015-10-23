@@ -174,7 +174,7 @@
           </classpathDependencyExcludes>
         </configuration>
       </plugin>
-      <plugin>
+      <!--<plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
         <version>1.7</version>
@@ -194,7 +194,7 @@
             <version>1.0</version>
           </signature>
         </configuration>
-      </plugin>
+      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
