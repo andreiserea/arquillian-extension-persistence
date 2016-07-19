@@ -15,7 +15,7 @@
   <!-- Artifact Configuration -->
   <groupId>org.jboss.arquillian.extension</groupId>
   <artifactId>arquillian-persistence-parent</artifactId>
-  <version>1.0.0.Alpha7-multipleds</version>
+  <version>1.0.0.Alpha7-multipleds-wildfly10</version>
   <packaging>pom</packaging>
 
   <name>Arquillian Persistence Extension Aggregator</name>
@@ -49,8 +49,8 @@
   <scm>
     <connection>scm:git:git@github.com:arquillian/arquillian-extension-persistence.git</connection>
     <developerConnection>scm:git:git@github.com:arquillian/arquillian-extension-persistence.git</developerConnection>
-    <url>https://github.com/arquillian/arquillian-extension-persistence</url>
-    <tag>1.0.0.Alpha7</tag>
+    <url>https://github.com/andreiserea/arquillian-extension-persistence</url>
+    <tag>1.0.0.Alpha7-multipleds-wildfly10</tag>
   </scm>
 
   <issueManagement>
@@ -61,21 +61,22 @@
   <!-- Properties -->
   <properties>
     <!-- Versioning -->
-    <version.arquillian_core>1.1.8.Final</version.arquillian_core>
-    <version.arquillian_transaction>1.0.1.Final</version.arquillian_transaction>
+    <version.arquillian_core>1.1.10.Final</version.arquillian_core>
+    <version.arquillian_transaction>1.0.3.Final</version.arquillian_transaction>
     <version.fest.assert>1.4</version.fest.assert>
     <version.testng>5.14.6</version.testng>
     <version.mockito>1.9.5</version.mockito>
     <version.arq.container.glassfish>1.0.0.CR4</version.arq.container.glassfish>
     <version.glassfish>3.1.2.2</version.glassfish>
     <version.jbossas_7>7.0.2.Final</version.jbossas_7>
-    <version.wildfly>8.2.0.Final</version.wildfly>
+    <version.wildfly.container.remote>1.1.0.Final</version.wildfly.container.remote>
+    <version.wildfly>10.0.0.Final</version.wildfly>
     <version.jbossas_spec>3.0.1.Final</version.jbossas_spec>
     <version.jbossas8_spec>1.0.3.Final</version.jbossas8_spec>
     <version.dbunit>2.5.0</version.dbunit>
     <version.mysql.driver>5.1.21</version.mysql.driver>
     <version.surefire.plugin>2.17</version.surefire.plugin>
-    <version.shrinkwrap.resolver>2.0.0</version.shrinkwrap.resolver>
+    <version.shrinkwrap.resolver>2.2.2</version.shrinkwrap.resolver>
     <!-- override from parent -->
     <jdk.min.version>1.7</jdk.min.version>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -174,7 +175,7 @@
           </classpathDependencyExcludes>
         </configuration>
       </plugin>
-      <!--<plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
         <version>1.7</version>
@@ -194,8 +195,8 @@
             <version>1.0</version>
           </signature>
         </configuration>
-      </plugin>-->
-      <plugin>
+      </plugin>
+      <!--<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.10</version>
@@ -216,7 +217,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
     </plugins>
   </build>
 
@@ -319,7 +320,7 @@
     <profile>
       <id>jbossas-7.0-managed</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <dependencies>
         <dependency>
@@ -353,33 +354,6 @@
         </dependency>
       </dependencies>
       <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>unpack</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>unpack</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.jboss.as</groupId>
-                      <artifactId>jboss-as-dist</artifactId>
-                      <version>${version.jbossas_7}</version>
-                      <type>zip</type>
-                      <overWrite>false</overWrite>
-                      <outputDirectory>${project.build.directory}</outputDirectory>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
         <testResources>
           <testResource>
             <directory>src/test/resources-datasets</directory>
@@ -826,12 +800,12 @@
       </build>
     </profile>
     <profile>
-      <id>wildfly-managed</id>
+      <id>wildfly8-managed</id>
       <dependencies>
         <dependency>
           <groupId>org.wildfly</groupId>
           <artifactId>wildfly-arquillian-container-managed</artifactId>
-          <version>${version.wildfly}</version>
+          <version>8.2.0.Final</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -917,6 +891,63 @@
             <directory>src/test/resources-wildfly-8.0.0</directory>
           </testResource>
         </testResources>
+      </build>
+    </profile>
+    <profile>
+      <id>wildfly10-remote</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.wildfly.arquillian</groupId>
+          <artifactId>wildfly-arquillian-container-managed</artifactId>
+          <version>${version.wildfly.container.remote}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.arquillian.protocol</groupId>
+          <artifactId>arquillian-protocol-servlet</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.arquillian.extension</groupId>
+          <artifactId>arquillian-transaction-jta</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.spec</groupId>
+          <artifactId>jboss-javaee-7.0</artifactId>
+          <version>${version.jbossas8_spec}</version> <!-- should be ok, wildfly10 is javaee7 also -->
+          <type>pom</type>
+          <scope>provided</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>xalan</groupId>
+              <artifactId>xalan</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+          	<!-- skip tests for now -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+        <!--<testResources>
+          <testResource>
+            <directory>src/test/resources-datasets</directory>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-scripts</directory>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-wildfly-8.0.0</directory>
+          </testResource>
+        </testResources>-->
       </build>
     </profile>
     <profile>
